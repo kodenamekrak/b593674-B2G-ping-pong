@@ -18,17 +18,24 @@ static float arena_half_size_x = 85.f, arena_half_size_y = 45.f;
 
 static const float PLAYER_OFFSET = 80.f;
 
-void update_position(bool upkey, bool downkey, float& player_pos, float& player_dp, float delta)
+void update_player_position(float& player_pos, float& player_dp, float player_ddp, float delta)
 {
-	float player_ddp = 0;
-	if (upkey) player_ddp += 2000;
-	if (downkey) player_ddp -= 2000;
-
 	player_ddp -= player_dp * 10.f;
 
 	player_pos = player_pos + player_dp * delta + player_ddp * delta * delta * .5f;
 	player_dp = player_dp + player_ddp * delta;
-	player_pos = std::clamp(player_pos, -33.0f, 33.0f);
+
+	if (player_pos + player_half_size_y > arena_half_size_y)
+	{
+		player_pos = arena_half_size_y - player_half_size_y;
+		player_dp = 0;
+	}
+
+	if (player_pos - player_half_size_y < -arena_half_size_y)
+	{
+		player_pos = -arena_half_size_y + player_half_size_y;
+		player_dp = 0;
+	}
 }
 
 static bool rect_collides(float x1, float y1, float half_size_x_1, float half_size_y_1, float x2, float y2, float half_size_x_2, float half_size_y_2)
@@ -53,10 +60,15 @@ void simulate_game(const Input& input, float delta)
 	clear_screen(BACKGROUND_COLOR);
 	draw_rect(0, 0, arena_half_size_x, arena_half_size_y, Color(255, 200, 40));
 
-	update_position(is_down(BUTTON_UP), is_down(BUTTON_DOWN), player_1_pos, player_1_dp, delta);
-	update_position(is_down(BUTTON_W), is_down(BUTTON_S), player_2_pos, player_2_dp, delta);
+	float player_1_ddp = 0;
+	if (is_down(BUTTON_UP)) player_1_ddp += 2000;
+	if (is_down(BUTTON_DOWN)) player_1_ddp -= 2000;
 
-	if(player_1_pos + player_half_size_y > arena_half_size_y)
+	float player_2_ddp = 0;
+	if (is_down(BUTTON_W)) player_2_ddp += 2000;
+	if (is_down(BUTTON_S)) player_2_ddp -= 2000;	
+	update_player_position(player_1_pos, player_1_dp, player_1_ddp, delta);
+	update_player_position(player_2_pos, player_2_dp, player_2_ddp, delta);
 
 	draw_rect(0, 0, 1, 1, BALL_COLOR);
 	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
