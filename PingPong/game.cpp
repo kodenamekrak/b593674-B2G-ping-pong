@@ -37,16 +37,15 @@ void simulate_game(const RenderState& render_state, const Input& input, float de
 	const Color BALL_COLOR(255, 255, 255);
 	const Color PADDLE_COLOR(255, 0, 0);
 
-	clear_screen(render_state, BACKGROUND_COLOR);
-	draw_rect(render_state, 0, 0, arena_half_size_x, arena_half_size_y, Color(255, 200, 40));
+	clear_screen(BACKGROUND_COLOR);
+	draw_rect(0, 0, arena_half_size_x, arena_half_size_y, Color(255, 200, 40));
 
 	update_position(is_down(BUTTON_UP), is_down(BUTTON_DOWN), player_1_pos, player_1_dp, delta);
 	update_position(is_down(BUTTON_W), is_down(BUTTON_S), player_2_pos, player_2_dp, delta);
 
 	if(player_1_pos + player_half_size_y > arena_half_size_y)
 
-	draw_rect(render_state, 0, 0, 1, 1, BALL_COLOR);
-
-	draw_rect(render_state, 80, player_1_pos, 2.5, 12, PADDLE_COLOR);
-	draw_rect(render_state, -80, player_2_pos, 2.5, 12, PADDLE_COLOR);
+	draw_rect(0, 0, 1, 1, BALL_COLOR);
+	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
+	draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
 }

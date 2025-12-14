@@ -16,6 +16,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result = 0;
 
+	auto& render_state = get_render_state();
 	switch (uMsg)
 	{
 		case WM_CLOSE:
@@ -100,6 +101,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	LARGE_INTEGER frame_begin_time;
 	QueryPerformanceCounter(&frame_begin_time);
 
+	auto& render_state = get_render_state();
+
 	while (running)
 	{
 
@@ -136,7 +139,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			}
 		}
 
-		simulate_game(render_state, input, delta_time);
+		simulate_game(input, delta_time);
 
 		StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.buffer, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 

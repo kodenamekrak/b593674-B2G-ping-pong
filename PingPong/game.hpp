@@ -3,4 +3,10 @@
 struct RenderState;
 struct Input;
 
-void simulate_game(const RenderState& render_state, const Input& input, float delta);
+enum GameMode
+{
+	GM_MENU,
+	GM_GAMEPLAY,
+};
+
+void simulate_game(const Input& input, float delta);

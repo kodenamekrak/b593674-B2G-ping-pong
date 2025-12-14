@@ -1,7 +1,14 @@
 #include "renderer.hpp"
 #include <algorithm>
 
-void render_background(const RenderState& render_state)
+static RenderState render_state;
+
+RenderState& get_render_state()
+{
+	return render_state;
+}
+
+void render_background()
 {
 	auto pixel = (uint32_t*)render_state.buffer;
 	for (int y = 0; y < render_state.height; y++)
@@ -14,7 +21,7 @@ void render_background(const RenderState& render_state)
 }
 
 
-void clear_screen(const RenderState& render_state, uint32_t color)
+void clear_screen(uint32_t color)
 {
 	auto pixel = (uint32_t*)render_state.buffer;
 	for (int y = 0; y < render_state.height; y++)
@@ -26,7 +33,7 @@ void clear_screen(const RenderState& render_state, uint32_t color)
 	}
 }
 
-void draw_rect_pixels(const RenderState& render_state, int x0, int y0, int x1, int y1, uint32_t color)
+void draw_rect_pixels(int x0, int y0, int x1, int y1, uint32_t color)
 {
 	x0 = std::clamp(x0, 0, render_state.width);
 	x1 = std::clamp(x1, 0, render_state.width);
@@ -45,7 +52,7 @@ void draw_rect_pixels(const RenderState& render_state, int x0, int y0, int x1, i
 
 static float render_scale = 0.01f;
 
-void draw_rect(const RenderState& render_state, float x, float y, float half_size_x, float half_size_y, uint32_t color)
+void draw_rect(float x, float y, float half_size_x, float half_size_y, uint32_t color)
 {
 	x *= render_state.height * render_scale;
 	y *= render_state.height * render_scale;
@@ -60,5 +67,5 @@ void draw_rect(const RenderState& render_state, float x, float y, float half_siz
 	int y0 = y - half_size_y;
 	int y1 = y + half_size_y;
 
-	draw_rect_pixels(render_state, x0, y0, x1, y1, color);
+	draw_rect_pixels(x0, y0, x1, y1, color);
 }
