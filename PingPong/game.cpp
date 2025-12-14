@@ -8,8 +8,8 @@
 #include "color.hpp"
 
 #define is_down(b) input.buttons[b].is_down
-#define is_pressed(b) (input.buttons[b].is_down && input->buttons[b].changed)
-#define is_released(b) (!input.buttons[b].is_down && input->buttons[b].changed)
+#define is_pressed(b) (input.buttons[b].is_down && input.buttons[b].changed)
+#define is_released(b) (!input.buttons[b].is_down && input.buttons[b].changed)
 
 static float player_1_pos = 0, player_2_pos = 0;
 static float player_1_dp = 0, player_2_dp = 0;
