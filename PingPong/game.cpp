@@ -31,7 +31,20 @@ void update_position(bool upkey, bool downkey, float& player_pos, float& player_
 	player_pos = std::clamp(player_pos, -33.0f, 33.0f);
 }
 
-void simulate_game(const RenderState& render_state, const Input& input, float delta)
+static bool rect_collides(float x1, float y1, float half_size_x_1, float half_size_y_1, float x2, float y2, float half_size_x_2, float half_size_y_2)
+{
+	return x1 + half_size_x_1 > x2 - half_size_x_2 && // Left border
+		   x1 - half_size_x_1 < x2 + half_size_x_2 && // Right Border
+		   y1 + half_size_y_1 > y2 - half_size_y_2 && // Bottom Border
+		   y1 - half_size_y_1 < y2 + half_size_y_2;   // Top border
+}
+
+static bool ball_collides_with_player(float player_pos_x, float player_pos_y)
+{
+	return rect_collides(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, player_pos_x, player_pos_y, player_half_size_x, player_half_size_y);
+}
+
+void simulate_game(const Input& input, float delta)
 {
 	const Color BACKGROUND_COLOR(255, 100, 40);
 	const Color BALL_COLOR(255, 255, 255);
