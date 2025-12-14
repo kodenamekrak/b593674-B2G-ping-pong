@@ -14,6 +14,9 @@
 static float player_1_pos = 0, player_2_pos = 0;
 static float player_1_dp = 0, player_2_dp = 0;
 static float player_half_size_x = 2.5f, player_half_size_y = 12.f;
+
+static int player_1_score = 0, player_2_score;
+
 static float arena_half_size_x = 85.f, arena_half_size_y = 45.f;
 
 static float ball_pos_x = 0, ball_pos_y = 0;
@@ -104,6 +107,29 @@ void simulate_game(const Input& input, float delta)
 		ball_dp_y *= -1;
 	}
 
+	{
+		auto reset_ball = [](float dx)
+			{
+				ball_pos_x = 0;
+				ball_pos_y = 0;
+				ball_dp_x = dx;
+				ball_dp_y = 0;
+			};
+
+		// Player 1 (right)
+		if (ball_pos_x + ball_half_size > arena_half_size_x)
+		{
+			player_2_score += 1;
+			reset_ball(50);
+		}
+		// Player 2 (left)
+		else if (ball_pos_x - ball_half_size < -arena_half_size_x)
+		{
+			player_1_score += 1;
+			reset_ball(-50);
+		}
+	}
+	
 	draw_rect(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, BALL_COLOR);
 	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
 	draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
