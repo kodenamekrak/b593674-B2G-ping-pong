@@ -13,7 +13,7 @@
 
 static float player_1_pos = 0, player_2_pos = 0;
 static float player_1_dp = 0, player_2_dp = 0;
-static float player_half_size_x = 2.5f, float player_half_size_y = 12.f;
+static float player_half_size_x = 2.5f, player_half_size_y = 12.f;
 static float arena_half_size_x = 85.f, arena_half_size_y = 45.f;
 
 static const float PLAYER_OFFSET = 80.f;
