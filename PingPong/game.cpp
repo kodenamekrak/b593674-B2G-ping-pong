@@ -16,6 +16,10 @@ static float player_1_dp = 0, player_2_dp = 0;
 static float player_half_size_x = 2.5f, player_half_size_y = 12.f;
 static float arena_half_size_x = 85.f, arena_half_size_y = 45.f;
 
+static float ball_pos_x = 0, ball_pos_y = 0;
+static float ball_dp_x = 120.f, ball_dp_y = 0;
+static float ball_half_size = 1;
+
 static const float PLAYER_OFFSET = 80.f;
 
 void update_player_position(float& player_pos, float& player_dp, float player_ddp, float delta)
@@ -70,7 +74,37 @@ void simulate_game(const Input& input, float delta)
 	update_player_position(player_1_pos, player_1_dp, player_1_ddp, delta);
 	update_player_position(player_2_pos, player_2_dp, player_2_ddp, delta);
 
-	draw_rect(0, 0, 1, 1, BALL_COLOR);
+
+	ball_pos_x += ball_dp_x * delta;
+	ball_pos_y += ball_dp_y * delta;
+
+	if (ball_collides_with_player(PLAYER_OFFSET, player_1_pos))
+	{
+		ball_pos_x = PLAYER_OFFSET - ball_half_size - player_half_size_x;
+		ball_dp_x *= -1;
+		ball_dp_y = min(ball_dp_y + player_1_dp, 300.f);
+	}
+	else if (ball_collides_with_player(-PLAYER_OFFSET, player_2_pos))
+	{
+		ball_pos_x = -PLAYER_OFFSET + ball_half_size + player_half_size_x;
+		ball_dp_x *= -1;
+		ball_dp_y = min(ball_dp_y + player_2_dp, 300.f);
+	}
+
+	// Top collision
+	if (ball_pos_y + ball_half_size > arena_half_size_y)
+	{
+		ball_pos_y = arena_half_size_y - ball_half_size;
+		ball_dp_y *= -1;
+	}
+	// Bottom collision
+	else if (ball_pos_y - ball_half_size < -arena_half_size_y)
+	{
+		ball_pos_y = -arena_half_size_y + ball_half_size;
+		ball_dp_y *= -1;
+	}
+
+	draw_rect(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, BALL_COLOR);
 	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
 	draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
 }
