@@ -129,8 +129,12 @@ void simulate_game(const Input& input, float delta)
 			reset_ball(-50);
 		}
 	}
-	
+
+	draw_number(player_1_score, 10, 40, 1.f, Color(255, 255, 255));
+	draw_number(player_2_score, -10, 40, 1.f, Color(255, 255, 255));
+
 	draw_rect(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, BALL_COLOR);
+
 	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
 	draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
 }
