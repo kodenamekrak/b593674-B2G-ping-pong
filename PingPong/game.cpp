@@ -13,6 +13,7 @@
 
 static GameMode game_mode = GM_MENU;
 static bool hot_button = false;
+bool enemy_is_ai;
 
 static float player_1_pos = 0, player_2_pos = 0;
 static float player_1_dp = 0, player_2_dp = 0;
@@ -73,6 +74,12 @@ void simulate_game(const Input& input, float delta)
 			hot_button = !hot_button;
 		}
 
+		if (is_pressed(BUTTON_ENTER))
+		{
+			game_mode = GM_GAMEPLAY;
+			enemy_is_ai = !hot_button;
+		}
+
 		if (hot_button == false)
 		{ 
 			draw_rect(-20, 0, 10, 10, Color(200, 0, 0));
@@ -99,8 +106,16 @@ void simulate_game(const Input& input, float delta)
 		if (is_down(BUTTON_DOWN)) player_1_ddp -= 2000;
 
 		float player_2_ddp = 0;
-		if (is_down(BUTTON_W)) player_2_ddp += 2000;
-		if (is_down(BUTTON_S)) player_2_ddp -= 2000;
+		if(enemy_is_ai)
+		{
+			if (ball_pos_y > player_2_pos + 2.f) player_2_ddp += 1200;
+			if (ball_pos_y < player_2_pos - 2.f) player_2_ddp -= 1200;
+		}
+		else
+		{
+			if (is_down(BUTTON_W)) player_2_ddp += 2000;
+			if (is_down(BUTTON_S)) player_2_ddp -= 2000;
+		}
 
 		update_player_position(player_1_pos, player_1_dp, player_1_ddp, delta);
 		update_player_position(player_2_pos, player_2_dp, player_2_ddp, delta);
