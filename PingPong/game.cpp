@@ -11,6 +11,9 @@
 #define is_pressed(b) (input.buttons[b].is_down && input.buttons[b].changed)
 #define is_released(b) (!input.buttons[b].is_down && input.buttons[b].changed)
 
+static GameMode game_mode = GM_MENU;
+static bool hot_button = false;
+
 static float player_1_pos = 0, player_2_pos = 0;
 static float player_1_dp = 0, player_2_dp = 0;
 static float player_half_size_x = 2.5f, player_half_size_y = 12.f;
@@ -60,81 +63,106 @@ static bool ball_collides_with_player(float player_pos_x, float player_pos_y)
 
 void simulate_game(const Input& input, float delta)
 {
-	const Color BACKGROUND_COLOR(255, 100, 40);
-	const Color BALL_COLOR(255, 255, 255);
-	const Color PADDLE_COLOR(255, 0, 0);
-
+	const Color BACKGROUND_COLOR(220, 180, 100);
 	clear_screen(BACKGROUND_COLOR);
-	draw_rect(0, 0, arena_half_size_x, arena_half_size_y, Color(255, 200, 40));
 
-	float player_1_ddp = 0;
-	if (is_down(BUTTON_UP)) player_1_ddp += 2000;
-	if (is_down(BUTTON_DOWN)) player_1_ddp -= 2000;
-
-	float player_2_ddp = 0;
-	if (is_down(BUTTON_W)) player_2_ddp += 2000;
-	if (is_down(BUTTON_S)) player_2_ddp -= 2000;	
-	update_player_position(player_1_pos, player_1_dp, player_1_ddp, delta);
-	update_player_position(player_2_pos, player_2_dp, player_2_ddp, delta);
-
-
-	ball_pos_x += ball_dp_x * delta;
-	ball_pos_y += ball_dp_y * delta;
-
-	if (ball_collides_with_player(PLAYER_OFFSET, player_1_pos))
+	if (game_mode == GM_MENU)
 	{
-		ball_pos_x = PLAYER_OFFSET - ball_half_size - player_half_size_x;
-		ball_dp_x *= -1;
-		ball_dp_y = min(ball_dp_y + player_1_dp, 300.f);
+		if (is_pressed(BUTTON_LEFT) || is_pressed(BUTTON_RIGHT))
+		{
+			hot_button = !hot_button;
+		}
+
+		if (hot_button == false)
+		{ 
+			draw_rect(-20, 0, 10, 10, Color(200, 0, 0));
+			draw_rect(20, 0, 10, 10, Color(200, 200, 200));
+		}
+		else
+		{ 
+			draw_rect(20, 0, 10, 10, Color(200, 0, 0));
+			draw_rect(-20, 0, 10, 10, Color(200, 200, 200));
+		}
+
+		draw_number(1, -20, 0, 2, Color(255, 255, 255));
+		draw_number(2, 20, 0, 2, Color(255, 255, 255));
 	}
-	else if (ball_collides_with_player(-PLAYER_OFFSET, player_2_pos))
+	else if (game_mode == GM_GAMEPLAY)
 	{
-		ball_pos_x = -PLAYER_OFFSET + ball_half_size + player_half_size_x;
-		ball_dp_x *= -1;
-		ball_dp_y = min(ball_dp_y + player_2_dp, 300.f);
-	}
+		const Color BALL_COLOR(255, 255, 255);
+		const Color PADDLE_COLOR(255, 0, 0);
 
-	// Top collision
-	if (ball_pos_y + ball_half_size > arena_half_size_y)
-	{
-		ball_pos_y = arena_half_size_y - ball_half_size;
-		ball_dp_y *= -1;
-	}
-	// Bottom collision
-	else if (ball_pos_y - ball_half_size < -arena_half_size_y)
-	{
-		ball_pos_y = -arena_half_size_y + ball_half_size;
-		ball_dp_y *= -1;
-	}
+		draw_rect(0, 0, arena_half_size_x, arena_half_size_y, Color(255, 200, 40));
 
-	{
-		auto reset_ball = [](float dx)
+		float player_1_ddp = 0;
+		if (is_down(BUTTON_UP)) player_1_ddp += 2000;
+		if (is_down(BUTTON_DOWN)) player_1_ddp -= 2000;
+
+		float player_2_ddp = 0;
+		if (is_down(BUTTON_W)) player_2_ddp += 2000;
+		if (is_down(BUTTON_S)) player_2_ddp -= 2000;
+
+		update_player_position(player_1_pos, player_1_dp, player_1_ddp, delta);
+		update_player_position(player_2_pos, player_2_dp, player_2_ddp, delta);
+
+		ball_pos_x += ball_dp_x * delta;
+		ball_pos_y += ball_dp_y * delta;
+
+		if (ball_collides_with_player(PLAYER_OFFSET, player_1_pos))
+		{
+			ball_pos_x = PLAYER_OFFSET - ball_half_size - player_half_size_x;
+			ball_dp_x *= -1;
+			ball_dp_y = min(ball_dp_y + player_1_dp, 300.f);
+		}
+		else if (ball_collides_with_player(-PLAYER_OFFSET, player_2_pos))
+		{
+			ball_pos_x = -PLAYER_OFFSET + ball_half_size + player_half_size_x;
+			ball_dp_x *= -1;
+			ball_dp_y = min(ball_dp_y + player_2_dp, 300.f);
+		}
+
+		// Top collision
+		if (ball_pos_y + ball_half_size > arena_half_size_y)
+		{
+			ball_pos_y = arena_half_size_y - ball_half_size;
+			ball_dp_y *= -1;
+		}
+		// Bottom collision
+		else if (ball_pos_y - ball_half_size < -arena_half_size_y)
+		{
+			ball_pos_y = -arena_half_size_y + ball_half_size;
+			ball_dp_y *= -1;
+		}
+
+		{
+			auto reset_ball = [](float dx)
+				{
+					ball_pos_x = 0;
+					ball_pos_y = 0;
+					ball_dp_x = dx;
+					ball_dp_y = 0;
+				};
+
+			// Player 1 (right)
+			if (ball_pos_x + ball_half_size > arena_half_size_x)
 			{
-				ball_pos_x = 0;
-				ball_pos_y = 0;
-				ball_dp_x = dx;
-				ball_dp_y = 0;
-			};
+				player_2_score += 1;
+				reset_ball(50);
+			}
+			// Player 2 (left)
+			else if (ball_pos_x - ball_half_size < -arena_half_size_x)
+			{
+				player_1_score += 1;
+				reset_ball(-50);
+			}
+		}
 
-		// Player 1 (right)
-		if (ball_pos_x + ball_half_size > arena_half_size_x)
-		{
-			player_2_score += 1;
-			reset_ball(50);
-		}
-		// Player 2 (left)
-		else if (ball_pos_x - ball_half_size < -arena_half_size_x)
-		{
-			player_1_score += 1;
-			reset_ball(-50);
-		}
+		draw_number(player_1_score, 10, 40, 1.f, Color(255, 255, 255));
+		draw_number(player_2_score, -10, 40, 1.f, Color(255, 255, 255));
+
+		draw_rect(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, BALL_COLOR);
+
+		draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
+		draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
 	}
-
-	draw_number(player_1_score, 10, 40, 1.f, Color(255, 255, 255));
-	draw_number(player_2_score, -10, 40, 1.f, Color(255, 255, 255));
-
-	draw_rect(ball_pos_x, ball_pos_y, ball_half_size, ball_half_size, BALL_COLOR);
-
-	draw_rect(PLAYER_OFFSET, player_1_pos, 2.5, 12, PADDLE_COLOR);
-	draw_rect(-PLAYER_OFFSET, player_2_pos, 2.5, 12, PADDLE_COLOR);
 }
