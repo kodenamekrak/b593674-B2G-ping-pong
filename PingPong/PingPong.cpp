@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <stdio.h>
 #include <cstdint>
+#include <chrono>
+#include <thread>
 
 #include "RenderState.hpp"
 #include "renderer.hpp"
@@ -98,21 +100,16 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	
 	HDC hdc = GetDC(window);
 
-	float delta_time = 1.0 / 60.0;
-	float performance_frequency;
-	{
-		LARGE_INTEGER perf;
-		QueryPerformanceFrequency(&perf);
-		performance_frequency = (float)perf.QuadPart;
-	}
-
-	LARGE_INTEGER frame_begin_time;
-	QueryPerformanceCounter(&frame_begin_time);
+	constexpr int FRAME_RATE = 60;
+	float delta_time = 1.f / FRAME_RATE;
+	namespace chrono = std::chrono;
+	chrono::duration<float> MAX_FRAME_TIME(delta_time);
 
 	auto& render_state = get_render_state();
 
 	while (running)
 	{
+		auto frame_start = chrono::steady_clock::now();
 
 		MSG message;
 		while (PeekMessage(&message, window, 0, 0, PM_REMOVE))
@@ -154,9 +151,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 		StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.buffer, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
 
-		LARGE_INTEGER frame_end_time;
-		QueryPerformanceCounter(&frame_end_time);
-		delta_time = (float)(frame_end_time.QuadPart - frame_begin_time.QuadPart) / performance_frequency;
-		frame_begin_time = frame_end_time;
+		auto frame_end = std::chrono::steady_clock::now();
+		std::this_thread::sleep_until(frame_start + MAX_FRAME_TIME);
+		delta_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - frame_start).count() / 1000.f;
 	}
 }
