@@ -7,7 +7,8 @@ x11_dep = dependency('x11')
 if get_option('build_type') == 'debug'
     add_global_arguments(['-g'], language: 'cpp')
 elif get_option('build_type') == ''
-    add_global_arguments(['-O2'], language: 'cpp')
+    add_global_arguments(['-O2', '-flto', '-Werror'], language: 'cpp')
+    add_global_link_arguments(['-flto'], language: 'cpp')
 endif
 
 executable('pingpong', sources,
