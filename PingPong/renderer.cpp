@@ -54,6 +54,11 @@ static float render_scale = 0.01f;
 
 void draw_rect(float x, float y, float half_size_x, float half_size_y, uint32_t color)
 {
+// X11 draws bottom to top
+#ifdef __linux__
+	y = -y;
+#endif
+
 	x *= render_state.height * render_scale;
 	y *= render_state.height * render_scale;
 	half_size_x *= render_state.height * render_scale;
