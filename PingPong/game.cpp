@@ -7,6 +7,9 @@
 
 #include "color.hpp"
 
+// Why does windows define this ????
+#undef min
+
 #define is_down(b) input.buttons[b].is_down
 #define is_pressed(b) (input.buttons[b].is_down && input.buttons[b].changed)
 #define is_released(b) (!input.buttons[b].is_down && input.buttons[b].changed)
@@ -127,13 +130,13 @@ void simulate_game(const Input& input, float delta)
 		{
 			ball_pos_x = PLAYER_OFFSET - ball_half_size - player_half_size_x;
 			ball_dp_x *= -1;
-			ball_dp_y = min(ball_dp_y + player_1_dp, 300.f);
+			ball_dp_y = std::min(ball_dp_y + player_1_dp, 300.f);
 		}
 		else if (ball_collides_with_player(-PLAYER_OFFSET, player_2_pos))
 		{
 			ball_pos_x = -PLAYER_OFFSET + ball_half_size + player_half_size_x;
 			ball_dp_x *= -1;
-			ball_dp_y = min(ball_dp_y + player_2_dp, 300.f);
+			ball_dp_y = std::min(ball_dp_y + player_2_dp, 300.f);
 		}
 
 		// Top collision
