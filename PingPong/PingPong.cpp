@@ -111,6 +111,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	{
 		auto frame_start = chrono::steady_clock::now();
 
+		for (int i = 0; i < BUTTON_COUNT; i++) {
+			input.buttons[i].changed = false;
+		}
+
 		MSG message;
 		while (PeekMessage(&message, window, 0, 0, PM_REMOVE))
 		{
