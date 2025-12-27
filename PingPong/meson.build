@@ -1,0 +1,1 @@
+sources = files('game.cpp', 'linux_main.cpp', 'renderer.cpp')
