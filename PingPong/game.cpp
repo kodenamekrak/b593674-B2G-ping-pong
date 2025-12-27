@@ -27,7 +27,7 @@ static int player_1_score = 0, player_2_score;
 static float arena_half_size_x = 85.f, arena_half_size_y = 45.f;
 
 static float ball_pos_x = 0, ball_pos_y = 0;
-static float ball_dp_x = 120.f, ball_dp_y = 0;
+static float ball_dp_x = 100.f, ball_dp_y = 0;
 static float ball_half_size = 1;
 
 static const float PLAYER_OFFSET = 80.f;
@@ -165,13 +165,13 @@ void simulate_game(const Input& input, float delta)
 			if (ball_pos_x + ball_half_size > arena_half_size_x)
 			{
 				player_2_score += 1;
-				reset_ball(50);
+				reset_ball(100);
 			}
 			// Player 2 (left)
 			else if (ball_pos_x - ball_half_size < -arena_half_size_x)
 			{
 				player_1_score += 1;
-				reset_ball(-50);
+				reset_ball(-100);
 			}
 		}
 
